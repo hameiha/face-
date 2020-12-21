@@ -15,6 +15,7 @@ using Baidu;
 using Newtonsoft;
 using Baidu.Aip.Face;
 using System.Data.SQLite;
+using System.Threading;
 
 namespace Demo01
 {
@@ -25,7 +26,9 @@ namespace Demo01
 		private string sKey = "MLQ7eocOmdGgzTw32tiaQqN1na7fF9K4";
 		private string TOKEN = "";
 		private string strSqlPath = "Data source=userInfo.db";
-		#endregion
+        #endregion
+
+        private Thread tShot;
 
 		public void getAccessToken()
 		{
@@ -61,8 +64,44 @@ namespace Demo01
                 foreach (FilterInfo device in videoDevices)
                 {
                     videoDevice = new VideoCaptureDevice(device.MonikerString);
+                    vispShoot.VideoSource = videoDevice;//把摄像头赋给控件
+                    vispShoot.Start();//开启摄像头
+
+                    camreaOn = true;
+                    tShot = new Thread(ShotThread);
+                    tShot.Start();
 
                 }
+            }
+        }
+
+        private bool camreaOn = false;
+        private void ShotThread()
+        {
+            while(camreaOn)
+            {
+                this.BeginInvoke(new Action(() =>
+                {
+                    Bitmap img = vispShoot.GetCurrentVideoFrame();//拍照
+                    pictureBox2.Image = img;
+                }));
+
+                Thread.Sleep(3000);
+            }
+            this.BeginInvoke(new Action(() =>
+            {
+                DisConnect();
+            }));
+        }
+
+        //关闭并释放摄像头
+        private void DisConnect()
+        {
+            if (vispShoot.VideoSource != null)
+            {
+                vispShoot.SignalToStop();
+                vispShoot.WaitForStop();
+                vispShoot.VideoSource = null;
             }
         }
 
@@ -89,7 +128,8 @@ namespace Demo01
 
 			if (!string.IsNullOrEmpty(dlg.FileName))
 			{
-				this.pictureBox1.Image = Image.FromFile(dlg.FileName);
+                camreaOn = false;
+				this.pictureBox2.Image = Image.FromFile(dlg.FileName);
 				string strImg = Convert.ToBase64String(File.ReadAllBytes(dlg.FileName));
 				SearchFaceInfo faceInfo = new SearchFaceInfo()
 				{

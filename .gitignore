@@ -8,6 +8,7 @@
 *.sln.docstates
 *.bak
 *.ide
+*.lock
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
