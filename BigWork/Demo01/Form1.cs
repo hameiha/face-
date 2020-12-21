@@ -65,6 +65,13 @@ namespace Demo01
                 {
                     videoDevice = new VideoCaptureDevice(device.MonikerString);
                     vispShoot.VideoSource = videoDevice;//把摄像头赋给控件
+                    foreach(var capability in videoDevice.VideoCapabilities)
+                    {
+                        if(capability.FrameSize.Width == 640 && capability.FrameSize.Height == 480)
+                        {
+                            videoDevice.VideoResolution = capability;
+                        }
+                    }
                     vispShoot.Start();//开启摄像头
 
                     camreaOn = true;
@@ -75,6 +82,9 @@ namespace Demo01
             }
         }
 
+        /// <summary>
+        /// 调用摄像头的实现方式就是不断地抓拍图片进行识别，每隔3秒一次抓拍
+        /// </summary>
         private bool camreaOn = false;
         private void ShotThread()
         {
@@ -83,7 +93,12 @@ namespace Demo01
                 this.BeginInvoke(new Action(() =>
                 {
                     Bitmap img = vispShoot.GetCurrentVideoFrame();//拍照
-                    pictureBox2.Image = img;
+                    if(img != null)
+                    {
+                        img.Save("test.jpg");
+                        Thread thFaceCheck = new Thread(FaceCheck);
+                        thFaceCheck.Start();                        
+                    }
                 }));
 
                 Thread.Sleep(3000);
@@ -102,6 +117,51 @@ namespace Demo01
                 vispShoot.SignalToStop();
                 vispShoot.WaitForStop();
                 vispShoot.VideoSource = null;
+            }
+        }
+
+        /// <summary>
+        /// 人脸检测，进行红框绘制
+        /// </summary>
+        /// <returns></returns>
+        private void FaceCheck()
+        {
+            try
+            {
+                var client = new Baidu.Aip.Face.Face(appKey, sKey);
+
+                var image = Convert.ToBase64String(File.ReadAllBytes("test.jpg"));
+
+                var imageType = "BASE64";
+
+                // 调用人脸检测，可能会抛出网络等异常，请使用try/catch捕获
+                var result = client.Detect(image, imageType);
+                Console.WriteLine(result);
+                // 如果有可选参数
+                var options = new Dictionary<string, object>{
+                    {
+                        "max_face_num", 5
+                    }
+                };
+                // 带参数调用人脸检测
+                result = client.Detect(image, imageType, options);
+                Console.WriteLine(result);
+                if(int.Parse(result["result"]["face_num"].ToString()) > 0)
+                {
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        byte[] imageBytes = Convert.FromBase64String(image);
+                        using (MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
+                        {
+                            ms.Write(imageBytes, 0, imageBytes.Length);
+                            this.pictureBox2.Image = Image.FromStream(ms, true);
+                        };
+                    }));
+                }
+            }
+            catch(Exception exp)
+            {
+                return;
             }
         }
 
@@ -242,4 +302,27 @@ namespace Demo01
 
 		public string Name { get; set; }
 	}
+
+    public class FaceCheckResult
+    {
+        [JsonProperty("face_token")]
+        public string face_token { get; set; }
+
+        [JsonProperty("location")]
+        public Location location { get; set; }
+    }
+
+    public class Location
+    {
+        [JsonProperty("left")]
+        public double left { get; set; }
+        [JsonProperty("top")]
+        public double top { get; set; }
+        [JsonProperty("width")]
+        public double width { get; set; }
+        [JsonProperty("height")]
+        public double height { get; set; }
+        [JsonProperty("rotation")]
+        public int rotation { get; set; }
+    }
 }
