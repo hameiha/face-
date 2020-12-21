@@ -16,6 +16,7 @@ using Newtonsoft;
 using Baidu.Aip.Face;
 using System.Data.SQLite;
 using System.Threading;
+using System.Drawing.Drawing2D;
 
 namespace Demo01
 {
@@ -155,6 +156,21 @@ namespace Demo01
                         {
                             ms.Write(imageBytes, 0, imageBytes.Length);
                             this.pictureBox2.Image = Image.FromStream(ms, true);
+                            Image img = pictureBox2.Image;
+                            Graphics g = Graphics.FromImage(img);
+                            var state = g.Save();
+                            var faceArr = JsonConvert.DeserializeObject<List<FaceCheckResult>>(result["result"]["face_list"].ToString());
+                            foreach(var item in faceArr)
+                            {
+                                Pen pen = new Pen(Color.Red, 3);
+                                pen.DashStyle = DashStyle.Solid;
+                                g.RotateTransform(item.location.rotation);
+                                g.TranslateTransform((float)item.location.left, (float)item.location.top, MatrixOrder.Append);
+                                g.DrawRectangle(pen, new Rectangle(0, 0, (int)item.location.width, (int)item.location.height));
+
+                                g.Dispose();
+                            }
+                            //g.Restore(state);
                         };
                     }));
                 }
