@@ -17,7 +17,9 @@ namespace Demo01
         public AddGroup()
         {
             InitializeComponent();
-        }
+			//启动窗口时居中显示
+			this.StartPosition = FormStartPosition.CenterScreen;
+		}
 
         private void button1_Click(object sender, EventArgs e)
         {

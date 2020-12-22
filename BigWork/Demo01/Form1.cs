@@ -29,8 +29,13 @@ namespace Demo01
 		private string strSqlPath = "Data source=userInfo.db";
         #endregion
 
+		//抓拍线程，每个3秒进行一次抓拍
         private Thread tShot;
 
+		//用来缓存抓拍图片的文件名
+		private string strCacheImgName = "test.jpg";
+
+		//其实可以不同token方式进行获取，直接使用类进行即可
 		public void getAccessToken()
 		{
 			string httpRequestToken = $"https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id={appKey}&client_secret={sKey}";
@@ -50,13 +55,19 @@ namespace Demo01
         {
             InitializeComponent();
 			getAccessToken();
-        }
+			//启动窗口时居中显示
+			this.StartPosition = FormStartPosition.CenterScreen;
+		}
 
         private FilterInfoCollection videoDevices;//所有摄像设备
         private VideoCaptureDevice videoDevice;//摄像设备
         private VideoCapabilities[] videoCapabilities;//摄像头分辨率
 
-
+		/// <summary>
+		/// 启动摄像头进行识别
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
             videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);//得到机器所有接入的摄像设备
@@ -96,9 +107,10 @@ namespace Demo01
                     Bitmap img = vispShoot.GetCurrentVideoFrame();//拍照
                     if(img != null)
                     {
-                        img.Save("test.jpg");
+						//拍照之后写入磁盘，并触发识别线程进行人脸检测
+                        img.Save(strCacheImgName);
                         Thread thFaceCheck = new Thread(FaceCheck);
-                        thFaceCheck.Start();                        
+                        thFaceCheck.Start(strCacheImgName);                        
                     }
                 }));
 
@@ -125,52 +137,56 @@ namespace Demo01
         /// 人脸检测，进行红框绘制
         /// </summary>
         /// <returns></returns>
-        private void FaceCheck()
+        private void FaceCheck(object objImagePath)
         {
             try
             {
+				string strImagePath = (string)objImagePath;
                 var client = new Baidu.Aip.Face.Face(appKey, sKey);
 
-                var image = Convert.ToBase64String(File.ReadAllBytes("test.jpg"));
+                var image = Convert.ToBase64String(File.ReadAllBytes(strImagePath));
 
                 var imageType = "BASE64";
-
-                // 调用人脸检测，可能会抛出网络等异常，请使用try/catch捕获
-                var result = client.Detect(image, imageType);
-                Console.WriteLine(result);
-                // 如果有可选参数
+				
                 var options = new Dictionary<string, object>{
                     {
                         "max_face_num", 5
                     }
                 };
                 // 带参数调用人脸检测
-                result = client.Detect(image, imageType, options);
+                var result = client.Detect(image, imageType, options);
                 Console.WriteLine(result);
+
+				//如果有人脸，则将图片加载到识别结果中
                 if(int.Parse(result["result"]["face_num"].ToString()) > 0)
                 {
                     this.BeginInvoke(new Action(() =>
                     {
+						//清空之前的查询结果
+						this.listView1.Items.Clear();
+						//直接从内存中拿数据，不用再读写磁盘数据，即将base64转为stream
                         byte[] imageBytes = Convert.FromBase64String(image);
                         using (MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
                         {
                             ms.Write(imageBytes, 0, imageBytes.Length);
                             this.pictureBox2.Image = Image.FromStream(ms, true);
+
+							//根据返回的人脸数据进行红框的绘制
                             Image img = pictureBox2.Image;
-                            Graphics g = Graphics.FromImage(img);
-                            var state = g.Save();
+
                             var faceArr = JsonConvert.DeserializeObject<List<FaceCheckResult>>(result["result"]["face_list"].ToString());
                             foreach(var item in faceArr)
-                            {
-                                Pen pen = new Pen(Color.Red, 3);
+							{
+								Graphics g = Graphics.FromImage(img);
+								Pen pen = new Pen(Color.Red, 3);
                                 pen.DashStyle = DashStyle.Solid;
                                 g.RotateTransform(item.location.rotation);
                                 g.TranslateTransform((float)item.location.left, (float)item.location.top, MatrixOrder.Append);
                                 g.DrawRectangle(pen, new Rectangle(0, 0, (int)item.location.width, (int)item.location.height));
 
                                 g.Dispose();
+								FaceSearch(item);
                             }
-                            //g.Restore(state);
                         };
                     }));
                 }
@@ -205,46 +221,47 @@ namespace Demo01
 			if (!string.IsNullOrEmpty(dlg.FileName))
 			{
                 camreaOn = false;
-				this.pictureBox2.Image = Image.FromFile(dlg.FileName);
-				string strImg = Convert.ToBase64String(File.ReadAllBytes(dlg.FileName));
-				SearchFaceInfo faceInfo = new SearchFaceInfo()
-				{
-					Image = strImg,
-					Image_type = "BASE64",
-					Group_id_list = "group1",
-					Quality_control = "NORMAL",
-					Liveness_control = "NONE"
-				};
-				var jString = JsonConvert.SerializeObject(faceInfo);
-				string host = "https://aip.baidubce.com/rest/2.0/face/v3/search?access_token=" + TOKEN;
-				Encoding encoding = Encoding.Default;
-				HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
-				request.Method = "post";
-				request.KeepAlive = true;
-				byte[] buffer = encoding.GetBytes(jString);
-				request.ContentLength = buffer.Length;
-				request.GetRequestStream().Write(buffer, 0, buffer.Length);
-				HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-				StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.Default);
-				string result = reader.ReadToEnd();
-				Console.WriteLine("人脸搜索:");
-				Console.WriteLine(result);
-				var json = (JObject)JsonConvert.DeserializeObject(result);
-				var userList = JsonConvert.DeserializeObject<List<SearchResult>>(json["result"]["user_list"].ToString());
+
+				FaceCheck(dlg.FileName);
+			}
+		}
+
+		/// <summary>
+		/// 进行人脸库的搜索，根据人脸检测的结果中的face
+		/// </summary>
+		/// <returns></returns>
+		private void FaceSearch(FaceCheckResult faceResult)
+		{	
+
+			var client = new Baidu.Aip.Face.Face(appKey, sKey);
+			//这里根据face_token搜索，其实没必要使用 m:n 方式，因为token只对应一个人脸
+			var result = client.Search(faceResult.face_token, "FACE_TOKEN", "group1");
+
+			if(result != null && JsonConvert.DeserializeObject<int>(result["error_code"].ToString()) == 0)
+			{
+				var userList = JsonConvert.DeserializeObject<List<SearchResult>>(result["result"]["user_list"].ToString());
 				int index = 1;
 				foreach (var item in userList)
 				{
-					this.listView1.Items.Add(new ListViewItem(new string[]
-						{
+					if(item.Score > 80.0)
+					{
+						this.listView1.Items.Add(new ListViewItem(new string[]
+							{
 							index++.ToString(),
 							item.Group_id,
 							item.User_id,
 							item.User_info
-						}));
+							}));
+					}
 				}
-
+			}
+			else
+			{
+				return;
 			}
 		}
+
+
 	}
 
 	public class FaceInfo
@@ -314,7 +331,7 @@ namespace Demo01
 		public string User_info { get; set; }
 		//用户组
 		[JsonProperty("score")]
-		public string Score { get; set; }
+		public double Score { get; set; }
 
 		public string Name { get; set; }
 	}

@@ -46,6 +46,9 @@ namespace Demo01
         {
             InitializeComponent();
             getAccessToken();
+
+			//启动窗口时居中显示
+			this.StartPosition = FormStartPosition.CenterScreen;
         }
 
         /// <summary>
@@ -237,7 +240,8 @@ namespace Demo01
         /// <param name="e"></param>
         private void button3_Click(object sender, EventArgs e)
         {
-
+			UserRegister userRegister = new UserRegister();
+			userRegister.ShowDialog();
         }
     }
 }
