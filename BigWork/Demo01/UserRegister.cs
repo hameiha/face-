@@ -130,6 +130,11 @@ namespace Demo01
 				MessageBox.Show("请选择人脸图片");
 				return;
 			}
+
+			//校验用户Id
+			if (!CheckUserId())
+				return;
+
 			try
 			{
 				var image = Convert.ToBase64String(File.ReadAllBytes(strFilePath));
@@ -166,6 +171,36 @@ namespace Demo01
 			{
 				MessageBox.Show("注册失败，错误信息：" + exp.Message);
 			}
+		}
+
+		/// <summary>
+		/// 校验是否存在userid
+		/// </summary>
+		/// <returns></returns>
+		private bool CheckUserId()
+		{
+			try
+			{
+				var client = new Face(appKey, sKey);
+				var result = client.UserGet(this.txtUserId.Text, this.cbGroups.SelectedItem.ToString());
+				Console.WriteLine(result);
+
+				if (int.Parse(result["error_code"].ToString()) == 0)
+				{
+					var ret = MessageBox.Show("用户ID已存在，是否覆盖？", "提示", MessageBoxButtons.OKCancel);
+					if (ret == DialogResult.OK)
+					{
+						return true;
+					}
+					else
+						return false;
+				}			
+			}
+			catch(Exception exp)
+			{
+
+			}
+			return true;
 		}
 
 		/// <summary>
