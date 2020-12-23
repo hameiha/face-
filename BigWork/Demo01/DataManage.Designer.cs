@@ -48,9 +48,9 @@
 			this.groupBox1.Controls.Add(this.button2);
 			this.groupBox1.Controls.Add(this.btnSelectGroup);
 			this.groupBox1.Location = new System.Drawing.Point(10, 10);
-			this.groupBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
 			this.groupBox1.Size = new System.Drawing.Size(140, 332);
 			this.groupBox1.TabIndex = 0;
 			this.groupBox1.TabStop = false;
@@ -61,16 +61,17 @@
 			this.lbGroups.FormattingEnabled = true;
 			this.lbGroups.ItemHeight = 12;
 			this.lbGroups.Location = new System.Drawing.Point(5, 67);
-			this.lbGroups.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.lbGroups.Margin = new System.Windows.Forms.Padding(2);
 			this.lbGroups.Name = "lbGroups";
 			this.lbGroups.Size = new System.Drawing.Size(132, 256);
 			this.lbGroups.TabIndex = 2;
 			this.lbGroups.SelectedIndexChanged += new System.EventHandler(this.lbGroups_SelectedIndexChanged);
+			this.lbGroups.MouseDown += new System.Windows.Forms.MouseEventHandler(this.lbGroups_MouseDown);
 			// 
 			// button2
 			// 
 			this.button2.Location = new System.Drawing.Point(80, 20);
-			this.button2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.button2.Margin = new System.Windows.Forms.Padding(2);
 			this.button2.Name = "button2";
 			this.button2.Size = new System.Drawing.Size(56, 23);
 			this.button2.TabIndex = 1;
@@ -81,7 +82,7 @@
 			// btnSelectGroup
 			// 
 			this.btnSelectGroup.Location = new System.Drawing.Point(5, 20);
-			this.btnSelectGroup.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.btnSelectGroup.Margin = new System.Windows.Forms.Padding(2);
 			this.btnSelectGroup.Name = "btnSelectGroup";
 			this.btnSelectGroup.Size = new System.Drawing.Size(56, 23);
 			this.btnSelectGroup.TabIndex = 0;
@@ -95,9 +96,9 @@
 			this.groupBox2.Controls.Add(this.button3);
 			this.groupBox2.Controls.Add(this.listView1);
 			this.groupBox2.Location = new System.Drawing.Point(154, 10);
-			this.groupBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
 			this.groupBox2.Size = new System.Drawing.Size(290, 332);
 			this.groupBox2.TabIndex = 1;
 			this.groupBox2.TabStop = false;
@@ -106,7 +107,7 @@
 			// button4
 			// 
 			this.button4.Location = new System.Drawing.Point(5, 20);
-			this.button4.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.button4.Margin = new System.Windows.Forms.Padding(2);
 			this.button4.Name = "button4";
 			this.button4.Size = new System.Drawing.Size(56, 23);
 			this.button4.TabIndex = 2;
@@ -117,7 +118,7 @@
 			// button3
 			// 
 			this.button3.Location = new System.Drawing.Point(80, 19);
-			this.button3.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.button3.Margin = new System.Windows.Forms.Padding(2);
 			this.button3.Name = "button3";
 			this.button3.Size = new System.Drawing.Size(56, 23);
 			this.button3.TabIndex = 1;
@@ -131,7 +132,7 @@
             this.userID,
             this.userInfo});
 			this.listView1.Location = new System.Drawing.Point(4, 67);
-			this.listView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.listView1.Margin = new System.Windows.Forms.Padding(2);
 			this.listView1.Name = "listView1";
 			this.listView1.Size = new System.Drawing.Size(282, 261);
 			this.listView1.TabIndex = 0;
@@ -155,7 +156,7 @@
 			this.ClientSize = new System.Drawing.Size(454, 352);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
-			this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "DataManage";
 			this.Text = "数据管理";
 			this.groupBox1.ResumeLayout(false);

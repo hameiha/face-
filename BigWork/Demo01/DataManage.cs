@@ -22,7 +22,9 @@ namespace Demo01
         #region  
         private string appKey = "v3l0duXNp0D6zsvRAaEEGjiR";
         private string sKey = "MLQ7eocOmdGgzTw32tiaQqN1na7fF9K4";
-        #endregion
+		#endregion
+
+		private ContextMenu groupMenu = new ContextMenu();
 
         public DataManage()
         {
@@ -30,14 +32,50 @@ namespace Demo01
 
 			//启动窗口时居中显示
 			this.StartPosition = FormStartPosition.CenterScreen;
+
+			MenuItem groupDelete = new MenuItem();
+			groupDelete.Text = "删除";
+			groupDelete.Click += GroupDelete_Click;
+			groupMenu.MenuItems.Add(groupDelete);
         }
 
-        /// <summary>
-        /// 查询组信息
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnSelectGroup_Click(object sender, EventArgs e)
+		private void GroupDelete_Click(object sender, EventArgs e)
+		{
+			if(this.lbGroups.SelectedItem != null)
+			{
+				try
+				{
+					var client = new Face(appKey, sKey);
+					var result = client.GroupDelete(lbGroups.SelectedItem.ToString());
+					Console.WriteLine(result);
+					if(result["error_code"].ToString().Equals("0"))
+					{
+						MessageBox.Show("删除成功");
+						this.lbGroups.Items.Remove(this.lbGroups.SelectedItem);
+					}
+					else
+					{
+						MessageBox.Show("删除失败，错误码：" + result["error_code"].ToString() + "\n错误信息：" + result["error_msg"].ToString());
+					}
+
+				}
+				catch(Exception exp)
+				{
+					MessageBox.Show("删除失败，错误信息：" + exp.Message);
+				}
+			}
+			else
+			{
+				MessageBox.Show("请选中需要删除的数据");
+			}
+		}
+
+		/// <summary>
+		/// 查询组信息
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void btnSelectGroup_Click(object sender, EventArgs e)
         {
 			try
 			{
@@ -230,5 +268,29 @@ namespace Demo01
 			UserRegister userRegister = new UserRegister();
 			userRegister.ShowDialog();
         }
-    }
+
+		/// <summary>
+		/// 鼠标按下的时候需要判断并添加菜单
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void lbGroups_MouseDown(object sender, MouseEventArgs e)
+		{
+			if(e.Button == MouseButtons.Right)
+			{
+				//设置右键选中功能
+				int height = 0;
+				for (int i = 0; i < lbGroups.Items.Count; i++)
+				{
+					height += lbGroups.GetItemHeight(i);
+					if (e.Y <= height)
+					{
+						this.lbGroups.SelectedIndex = i;
+						break;
+					}
+				}
+				lbGroups.ContextMenu = groupMenu;
+			}
+		}
+	}
 }
