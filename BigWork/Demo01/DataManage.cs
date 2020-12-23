@@ -115,34 +115,52 @@ namespace Demo01
         // 获取用户列表
         public  void groupGetusers(string strGroupID)
         {
-            //string host = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/group/getusers?access_token=" + TOKEN;
-            //Encoding encoding = Encoding.Default;
-            //HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
-            //request.Method = "post";
-            //request.KeepAlive = true;
-            //String str = "{\"group_id\":\"" + strGroupID + "\"}";
-            //byte[] buffer = encoding.GetBytes(str);
-            //request.ContentLength = buffer.Length;
-            //request.GetRequestStream().Write(buffer, 0, buffer.Length);
-            //HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            //StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.Default);
-            //string result = reader.ReadToEnd();
-            //Console.WriteLine("获取用户列表:");
-            //Console.WriteLine(result);
+            try
+            {
+                var client = new Face(appKey, sKey);
+                var result = client.GroupGetusers(strGroupID);
+                Console.WriteLine(result);
 
-            //var json = (JObject)JsonConvert.DeserializeObject(result);
-            //var users = JsonConvert.DeserializeObject<List<string>>(json["result"]["user_id_list"].ToString());
-            //if (users.Count > 0 && this.lbGroups.Items.Count > 0)
-            //    this.listView1.Items.Clear();
-            //foreach (var item in users)
-            //{
-            //    this.listView1.Items.Add(new ListViewItem(new string[]
-            //        {
-            //            item,
-            //            GetUserInfoFromSQL(item)
-            //        }));
-            //    ;
-            //}
+                var users = JsonConvert.DeserializeObject<List<string>>(result["result"]["user_id_list"].ToString());
+                if (users.Count > 0 && this.lbGroups.Items.Count > 0)
+                    this.listView1.Items.Clear();
+                foreach (var item in users)
+                {
+                    this.listView1.Items.Add(new ListViewItem(new string[]
+                        {
+                            item,
+                            GetUserInfo(client, item, strGroupID)
+                        }));
+                    ;
+                }
+
+            }
+            catch (Exception exp)
+            {
+
+            }
+        }
+
+        private string GetUserInfo(Face client, string userId, string groupId)
+        {
+            try
+            {
+                var result = client.UserGet(userId, groupId);
+                Console.WriteLine(result);
+                if(int.Parse(result["error_code"].ToString()) == 0)
+                {
+                    return result["result"]["user_list"][0]["user_info"].ToString();
+                }
+                else
+                {
+                    MessageBox.Show("获取用户信息失败，错误信息：" + result["error_msg"].ToString());
+                    return "";
+                }
+            }catch(Exception exp)
+            {
+                MessageBox.Show("获取用户信息失败，错误信息：" + exp.Message);
+            }
+            return "";
         }
 
         // 用户信息查询
