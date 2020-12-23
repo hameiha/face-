@@ -20,12 +20,11 @@ namespace Demo01
 		private string appKey = "v3l0duXNp0D6zsvRAaEEGjiR";
 		private string sKey = "MLQ7eocOmdGgzTw32tiaQqN1na7fF9K4";
 
-		private string strFilePath = "";
+        private string strFilePath = "";
 		
 		public UserRegister()
 		{
 			InitializeComponent();
-			GroupGetlistDemo();
 
 			//启动窗口时居中显示
 			this.StartPosition = FormStartPosition.CenterScreen;
@@ -34,27 +33,28 @@ namespace Demo01
 		/// <summary>
 		/// 查询所有组信息
 		/// </summary>
-		public void GroupGetlistDemo()
+		public bool GroupGetlistDemo()
 		{
 			try
 			{
 				var client = new Face(appKey, sKey);
-
 				var json = client.GroupGetlist();
-				Console.WriteLine(json);
 
 				var groupArr = JsonConvert.DeserializeObject<List<string>>(json["result"]["group_id_list"].ToString());
-				if (groupArr.Count > 0 && this.cbGroups.Items.Count > 0)
-					this.cbGroups.Items.Clear();
-				foreach (var item in groupArr)
-				{
-					this.cbGroups.Items.Add(item);
-				}
+				if (groupArr.Count > 0)
+                {
+                    foreach (var item in groupArr)
+                    {
+                        this.cbGroups.Items.Add(item);
+                    }
+                    return true;
+                }
 			}
 			catch(Exception exp)
 			{
 				MessageBox.Show("获取组列表信息失败，错误信息：" + exp.Message);
 			}
+            return false;
 		}
 
 		/// <summary>
@@ -210,8 +210,16 @@ namespace Demo01
 		/// <param name="e"></param>
 		private void UserRegister_Load(object sender, EventArgs e)
 		{
-			if (this.cbGroups != null && this.cbGroups.Items.Count > 0)
-				this.cbGroups.SelectedIndex = 0;
+            if (GroupGetlistDemo())
+            {
+                if (this.cbGroups != null && this.cbGroups.Items.Count > 0)
+                    this.cbGroups.SelectedIndex = 0;
+            }
+            else
+            {
+                this.Close();
+                return;
+            }
 		}
 	}
 }

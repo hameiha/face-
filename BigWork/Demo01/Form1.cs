@@ -25,43 +25,28 @@ namespace Demo01
 		#region  
 		private string appKey = "v3l0duXNp0D6zsvRAaEEGjiR";
 		private string sKey = "MLQ7eocOmdGgzTw32tiaQqN1na7fF9K4";
-		private string TOKEN = "";
 		private string strSqlPath = "Data source=userInfo.db";
+        
+        private string voiceAppKey = "GRsvpI62QCUUD88RVglKoMmX";
+        private string voiceSshKey = "Et1ydT3YQf4iQCbhCcLUZGSOkyVblm4x";
         #endregion
 
-		//抓拍线程，每个3秒进行一次抓拍
+        //抓拍线程，每个3秒进行一次抓拍
         private Thread tShot;
 
 		//用来缓存抓拍图片的文件名
 		private string strCacheImgName = "test.jpg";
-
-		//其实可以不同token方式进行获取，直接使用类进行即可
-		public void getAccessToken()
-		{
-			string httpRequestToken = $"https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id={appKey}&client_secret={sKey}";
-
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(httpRequestToken);
-			request.Method = "Get";
-			WebResponse response = request.GetResponse();
-
-			var test = new StreamReader(response.GetResponseStream());
-			var result = test.ReadToEnd();
-			Console.WriteLine(result);
-			var json = (JObject)JsonConvert.DeserializeObject(result);
-
-			TOKEN = json["access_token"].ToString();
-		}
+        
 		public Form1()
         {
             InitializeComponent();
-			getAccessToken();
+
 			//启动窗口时居中显示
 			this.StartPosition = FormStartPosition.CenterScreen;
 		}
 
         private FilterInfoCollection videoDevices;//所有摄像设备
         private VideoCaptureDevice videoDevice;//摄像设备
-        private VideoCapabilities[] videoCapabilities;//摄像头分辨率
 
 		/// <summary>
 		/// 启动摄像头进行识别
@@ -70,28 +55,37 @@ namespace Demo01
 		/// <param name="e"></param>
         private void button1_Click(object sender, EventArgs e)
         {
-            videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);//得到机器所有接入的摄像设备
-            if (videoDevices.Count != 0)
+            if(this.button1.Text == "摄像头识别")
             {
-                foreach (FilterInfo device in videoDevices)
+                videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);//得到机器所有接入的摄像设备
+                if (videoDevices.Count != 0)
                 {
-                    videoDevice = new VideoCaptureDevice(device.MonikerString);
-                    vispShoot.VideoSource = videoDevice;//把摄像头赋给控件
-                    foreach(var capability in videoDevice.VideoCapabilities)
+                    foreach (FilterInfo device in videoDevices)
                     {
-                        if(capability.FrameSize.Width == 640 && capability.FrameSize.Height == 480)
+                        videoDevice = new VideoCaptureDevice(device.MonikerString);
+                        vispShoot.VideoSource = videoDevice;//把摄像头赋给控件
+                        foreach (var capability in videoDevice.VideoCapabilities)
                         {
-                            videoDevice.VideoResolution = capability;
+                            if (capability.FrameSize.Width == 640 && capability.FrameSize.Height == 480)
+                            {
+                                videoDevice.VideoResolution = capability;
+                            }
                         }
+                        vispShoot.Start();//开启摄像头
+
+                        camreaOn = true;
+                        tShot = new Thread(ShotThread);
+                        tShot.Start();
+
+                        this.button1.Text = "关闭摄像头";
                     }
-                    vispShoot.Start();//开启摄像头
-
-                    camreaOn = true;
-                    tShot = new Thread(ShotThread);
-                    tShot.Start();
-
                 }
             }
+            else
+            {
+                camreaOn = false;
+                DisConnect();
+            }           
         }
 
         /// <summary>
@@ -105,21 +99,28 @@ namespace Demo01
                 this.BeginInvoke(new Action(() =>
                 {
                     Bitmap img = vispShoot.GetCurrentVideoFrame();//拍照
-                    if(img != null)
+                    try
                     {
-						//拍照之后写入磁盘，并触发识别线程进行人脸检测
-                        img.Save(strCacheImgName);
-                        Thread thFaceCheck = new Thread(FaceCheck);
-                        thFaceCheck.Start(strCacheImgName);                        
+                        if (img != null)
+                        {
+                            //拍照之后写入磁盘，并触发识别线程进行人脸检测
+                            img.Save(strCacheImgName);
+                            Thread thFaceCheck = new Thread(FaceCheck);
+                            thFaceCheck.Start(strCacheImgName);
+                        }
                     }
+                    finally
+                    {
+                        if(img != null)
+                        {
+                            img.Dispose();
+                            img = null;
+                        }
+                    }
+                   
                 }));
-
                 Thread.Sleep(3000);
             }
-            this.BeginInvoke(new Action(() =>
-            {
-                DisConnect();
-            }));
         }
 
         //关闭并释放摄像头
@@ -222,6 +223,8 @@ namespace Demo01
 			{
                 camreaOn = false;
 
+                DisConnect();
+
 				FaceCheck(dlg.FileName);
 			}
 		}
@@ -260,11 +263,9 @@ namespace Demo01
 				return;
 			}
 		}
+    }
 
-
-	}
-
-	public class FaceInfo
+    public class FaceInfo
 	{
 		//人脸图像信息  不超过10M
 		[JsonProperty("image")]

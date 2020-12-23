@@ -28,28 +28,30 @@ namespace Demo01
 		{
 			InitializeComponent();
 
-			GetGroupInfo();
-			this.cbGroupId.SelectedIndex = 0;
-
 			this.StartPosition = FormStartPosition.CenterScreen;
 		}
 
-		private void GetGroupInfo()
+		private bool GetGroupInfo()
 		{
 			try
 			{
 				var client = new Face(appKey, sKey);
 				var result = client.GroupGetlist();
 				var groupArr = JsonConvert.DeserializeObject<List<string>>(result["result"]["group_id_list"].ToString());
-				foreach (var item in groupArr)
-				{
-					this.cbGroupId.Items.Add(item);
-				}
+                if(groupArr.Count > 0)
+                {
+                    foreach (var item in groupArr)
+                    {
+                        this.cbGroupId.Items.Add(item);
+                    }
+                    return true;
+                }
 			}
 			catch (Exception exp)
 			{
 				MessageBox.Show("查询组信息失败，错误信息：" + exp.Message);
 			}
+            return false;
 		}
 
 		/// <summary>
@@ -87,5 +89,15 @@ namespace Demo01
 			bOk = false;
 			this.Close();
 		}
-	}
+
+        private void UserQuery_Load(object sender, EventArgs e)
+        {
+            if (!GetGroupInfo())
+            {
+                this.Close();
+                return;
+            }
+            this.cbGroupId.SelectedIndex = 0;
+        }
+    }
 }
