@@ -99,14 +99,14 @@
 			this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
-			this.groupBox2.Size = new System.Drawing.Size(290, 332);
+			this.groupBox2.Size = new System.Drawing.Size(317, 332);
 			this.groupBox2.TabIndex = 1;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "用户管理";
 			// 
 			// button4
 			// 
-			this.button4.Location = new System.Drawing.Point(5, 20);
+			this.button4.Location = new System.Drawing.Point(81, 18);
 			this.button4.Margin = new System.Windows.Forms.Padding(2);
 			this.button4.Name = "button4";
 			this.button4.Size = new System.Drawing.Size(56, 23);
@@ -117,7 +117,7 @@
 			// 
 			// button3
 			// 
-			this.button3.Location = new System.Drawing.Point(80, 19);
+			this.button3.Location = new System.Drawing.Point(4, 18);
 			this.button3.Margin = new System.Windows.Forms.Padding(2);
 			this.button3.Name = "button3";
 			this.button3.Size = new System.Drawing.Size(56, 23);
@@ -131,29 +131,31 @@
 			this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.userID,
             this.userInfo});
+			this.listView1.FullRowSelect = true;
 			this.listView1.Location = new System.Drawing.Point(4, 67);
 			this.listView1.Margin = new System.Windows.Forms.Padding(2);
 			this.listView1.Name = "listView1";
-			this.listView1.Size = new System.Drawing.Size(282, 261);
+			this.listView1.Size = new System.Drawing.Size(309, 261);
 			this.listView1.TabIndex = 0;
 			this.listView1.UseCompatibleStateImageBehavior = false;
 			this.listView1.View = System.Windows.Forms.View.Details;
+			this.listView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseDown);
 			// 
 			// userID
 			// 
 			this.userID.Text = "用户ID";
-			this.userID.Width = 113;
+			this.userID.Width = 80;
 			// 
 			// userInfo
 			// 
 			this.userInfo.Text = "用户信息";
-			this.userInfo.Width = 238;
+			this.userInfo.Width = 200;
 			// 
 			// DataManage
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(454, 352);
+			this.ClientSize = new System.Drawing.Size(482, 352);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.groupBox1);
 			this.Margin = new System.Windows.Forms.Padding(2);

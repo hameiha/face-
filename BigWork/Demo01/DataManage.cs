@@ -25,6 +25,7 @@ namespace Demo01
 		#endregion
 
 		private ContextMenu groupMenu = new ContextMenu();
+		private ContextMenu userMenu = new ContextMenu();
 
         public DataManage()
         {
@@ -37,7 +38,49 @@ namespace Demo01
 			groupDelete.Text = "删除";
 			groupDelete.Click += GroupDelete_Click;
 			groupMenu.MenuItems.Add(groupDelete);
-        }
+
+			MenuItem userDelete = new MenuItem();
+			userDelete.Text = "删除";
+			userDelete.Click += UserDelete_Click;
+			userMenu.MenuItems.Add(userDelete);
+		}
+
+		/// <summary>
+		/// 用户信息删除
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void UserDelete_Click(object sender, EventArgs e)
+		{
+			if (this.listView1.SelectedItems != null)
+			{
+				string strUserId = this.listView1.SelectedItems[0].Text;
+				try
+				{
+					var client = new Face(appKey, sKey);
+					var result = client.UserDelete(lbGroups.SelectedItem.ToString(), strUserId);
+					Console.WriteLine(result);
+					if (result["error_code"].ToString().Equals("0"))
+					{
+						MessageBox.Show("删除成功");
+						this.listView1.Items.Remove(this.listView1.SelectedItems[0]);
+					}
+					else
+					{
+						MessageBox.Show("删除失败，错误码：" + result["error_code"].ToString() + "\n错误信息：" + result["error_msg"].ToString());
+					}
+
+				}
+				catch (Exception exp)
+				{
+					MessageBox.Show("删除失败，错误信息：" + exp.Message);
+				}
+			}
+			else
+			{
+				MessageBox.Show("请选中需要删除的数据");
+			}
+		}
 
 		private void GroupDelete_Click(object sender, EventArgs e)
 		{
@@ -147,7 +190,35 @@ namespace Demo01
         /// <param name="e"></param>
         private void button4_Click(object sender, EventArgs e)
         {
+			UserQuery dlg = new UserQuery();
+			dlg.ShowDialog();
 
+			if(dlg.bOk)
+			{
+				try
+				{
+					this.listView1.Items.Clear();
+					var client = new Face(appKey, sKey);
+					var result = client.UserGet(dlg.strUserId, dlg.strGroupId);
+					Console.WriteLine(result);
+					if (int.Parse(result["error_code"].ToString()) == 0)
+					{
+						this.listView1.Items.Add(new ListViewItem(new string[]
+							 {
+							dlg.strUserId,
+							result["result"]["user_list"][0]["user_info"].ToString()
+							 }));
+					}
+					else
+					{
+						MessageBox.Show("获取用户信息失败，错误码：" + result["error_code"].ToString() + "\n错误信息" + result["error_msg"].ToString());
+					}
+				}
+				catch (Exception exp)
+				{
+					MessageBox.Show("获取用户信息失败，错误信息：" + exp.Message);
+				}	
+			}
         }
 
         // 获取用户列表
@@ -290,6 +361,19 @@ namespace Demo01
 					}
 				}
 				lbGroups.ContextMenu = groupMenu;
+			}
+		}
+
+		/// <summary>
+		/// 用户信息鼠标右键删除
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void listView1_MouseDown(object sender, MouseEventArgs e)
+		{
+			if(e.Button == MouseButtons.Right)
+			{
+				this.listView1.ContextMenu = userMenu;
 			}
 		}
 	}
