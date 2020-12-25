@@ -73,9 +73,9 @@
             // 
             this.groupBox1.Controls.Add(this.vispShoot);
             this.groupBox1.Location = new System.Drawing.Point(16, 42);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(467, 391);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
@@ -83,7 +83,7 @@
             // vispShoot
             // 
             this.vispShoot.Location = new System.Drawing.Point(8, 24);
-            this.vispShoot.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.vispShoot.Margin = new System.Windows.Forms.Padding(4);
             this.vispShoot.Name = "vispShoot";
             this.vispShoot.Size = new System.Drawing.Size(451, 358);
             this.vispShoot.TabIndex = 4;
@@ -94,9 +94,9 @@
             // 
             this.groupBox2.Controls.Add(this.pictureBox2);
             this.groupBox2.Location = new System.Drawing.Point(537, 42);
-            this.groupBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox2.Size = new System.Drawing.Size(467, 391);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
@@ -116,9 +116,9 @@
             // 
             this.groupBox3.Controls.Add(this.listView1);
             this.groupBox3.Location = new System.Drawing.Point(23, 442);
-            this.groupBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox3.Size = new System.Drawing.Size(981, 180);
             this.groupBox3.TabIndex = 5;
             this.groupBox3.TabStop = false;
@@ -132,7 +132,7 @@
             this.columnHeader3,
             this.columnHeader4});
             this.listView1.Location = new System.Drawing.Point(9, 26);
-            this.listView1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.listView1.Margin = new System.Windows.Forms.Padding(4);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(955, 145);
             this.listView1.TabIndex = 0;
@@ -162,7 +162,7 @@
             // button3
             // 
             this.button3.Location = new System.Drawing.Point(770, 14);
-            this.button3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.button3.Margin = new System.Windows.Forms.Padding(4);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(100, 29);
             this.button3.TabIndex = 6;
@@ -183,7 +183,7 @@
             this.Controls.Add(this.button1);
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "人脸识别签到欢迎系统";
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
