@@ -239,21 +239,20 @@
             // columnHeader1
             // 
             this.columnHeader1.Text = "索引";
+            this.columnHeader1.Width = 50;
             // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "组ID";
-            this.columnHeader2.Width = 70;
             // 
             // columnHeader3
             // 
             this.columnHeader3.Text = "用户ID";
-            this.columnHeader3.Width = 70;
             // 
             // columnHeader4
             // 
             this.columnHeader4.Text = "用户信息";
-            this.columnHeader4.Width = 150;
+            this.columnHeader4.Width = 100;
             // 
             // columnHeader5
             // 

@@ -332,6 +332,13 @@ namespace Demo01
 
 		}
 
+        /// <summary>
+        /// 插入数据库
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="userId"></param>
+        /// <param name="userInfo"></param>
+        /// <param name="signTime"></param>
         private void InsertSignTime(string groupId, string userId, string userInfo, DateTime signTime)
         {
             using (SQLiteConnection conn = new SQLiteConnection(strSqlPath))
@@ -354,7 +361,6 @@ namespace Demo01
                     }
                 }
             }
-
         }
     }  
 

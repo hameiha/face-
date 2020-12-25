@@ -22,9 +22,10 @@ namespace Demo01
         #region  
         private string appKey = "v3l0duXNp0D6zsvRAaEEGjiR";
         private string sKey = "MLQ7eocOmdGgzTw32tiaQqN1na7fF9K4";
-		#endregion
+        #endregion
+        private string strSqlPath = "Data source=userInfo.db";
 
-		private ContextMenu groupMenu = new ContextMenu();
+        private ContextMenu groupMenu = new ContextMenu();
 		private ContextMenu userMenu = new ContextMenu();
 
         public DataManage()
@@ -385,7 +386,32 @@ namespace Demo01
         /// <param name="e"></param>
         private void btnSignFormSelect_Click(object sender, EventArgs e)
         {
+            using (SQLiteConnection conn = new SQLiteConnection(strSqlPath))
+            {
+                string strSQL = $"select * from signform where signtime >= '{this.dateStart.Value.ToString("yyyy-MM-dd")}' and signtime <= '{this.dateEnd.Value.AddDays(1).ToString("yyyy-MM-dd")}'";
 
+                using (SQLiteCommand cmd = new SQLiteCommand(strSQL, conn))
+                {
+                    conn.Open();
+                    using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.HasRows)
+                        {
+                            while (dbReader.Read())
+                            {
+                                lvSignForm.Items.Add(new ListViewItem(new string[]
+                                {
+                                    dbReader.GetInt32(0).ToString(),
+                                    dbReader.GetString(1),
+                                    dbReader.GetString(2),
+                                    dbReader.GetString(3),
+                                    dbReader.GetString(4)
+                            }));
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
