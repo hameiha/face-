@@ -17,6 +17,7 @@ using Baidu.Aip.Face;
 using System.Data.SQLite;
 using System.Threading;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 
 namespace Demo01
 {
@@ -29,10 +30,12 @@ namespace Demo01
         
         private string voiceAppKey = "GRsvpI62QCUUD88RVglKoMmX";
         private string voiceSshKey = "Et1ydT3YQf4iQCbhCcLUZGSOkyVblm4x";
-        #endregion
+		[DllImport("winmm.dll", SetLastError = true)]
+		static extern long mciSendString(string strCommand, StringBuilder strReturn, int iReturnLength, IntPtr hwndCallBack);
+		#endregion
 
-        //抓拍线程，每个3秒进行一次抓拍
-        private Thread tShot;
+		//抓拍线程，每个3秒进行一次抓拍
+		private Thread tShot;
 
 		//用来缓存抓拍图片的文件名
 		private string strCacheImgName = "test.jpg";
@@ -259,6 +262,7 @@ namespace Demo01
                         strAllUser += item.User_info + ",";
 					}
 				}
+				VoiceBroadcast("你好，" + strAllUser);
 			}
 			else
 			{
@@ -266,54 +270,47 @@ namespace Demo01
 			}
 		}
 
-        //private void VoiceBroadcast(string strAllUserInfo)
-        //{
-        //    try
-        //    {
-        //            var client = new Baidu.Aip.Speech.Tts(voiceAppKey, voiceSshKey);
+		private void VoiceBroadcast(string strAllUserInfo)
+		{
+			try
+			{
+				var client = new Baidu.Aip.Speech.Tts(voiceAppKey, voiceSshKey);
 
-        //            var options = new Dictionary<string, object>()
-        //    {
-        //        {"spd", this.trbSpeed.Value},    //语速
-        //        {"vol", this.trbVolume.Value},     //音量
-        //        {"pit", this.trbTonality.Value },  //音调
-        //        {"aue", GetSynthesisFormat(this.cbxSynthesisFormat.SelectedItem.ToString()) },  //输出的合成格式
-        //        {"per", GetSpeaker(this.cbxSpeaker.SelectedItem.ToString())}     //语音人
-        //    };
+				var options = new Dictionary<string, object>()
+				{
+					{ "spd", 5},    //语速
+					{ "vol", 7},     //音量
+					{ "per", 4}     //语音人
+				};
 
-        //            var ret = client.Synthesis(this.textInfoToSynthesis.Text, options);
+				var ret = client.Synthesis(strAllUserInfo, options);
 
-        //            if (ret.ErrorCode == 0)
-        //            {
-        //                File.WriteAllBytes("temp." + this.cbxSynthesisFormat.SelectedItem.ToString(), ret.Data);
-        //                mciSendString("open temp." + this.cbxSynthesisFormat.SelectedItem.ToString() + " alias temp_alias", null, 0, IntPtr.Zero);
-        //                mciSendString("play temp_alias", null, 0, IntPtr.Zero);
+				if (ret.ErrorCode == 0)
+				{
+					File.WriteAllBytes("temp.mp3", ret.Data);
+					mciSendString("open temp.mp3" + " alias temp_alias", null, 0, IntPtr.Zero);
+					mciSendString("play temp_alias", null, 0, IntPtr.Zero);
 
-        //                StringBuilder strRet = new StringBuilder(64);
+					StringBuilder strRet = new StringBuilder(64);
 
-        //                do
-        //                {
-        //                    mciSendString("status temp_alias mode", strRet, 64, IntPtr.Zero);
-        //                } while (!strRet.ToString().Contains("stopped"));
+					do
+					{
+						mciSendString("status temp_alias mode", strRet, 64, IntPtr.Zero);
+					} while (!strRet.ToString().Contains("stopped"));
 
-        //                mciSendString("close temp_alias", null, 0, IntPtr.Zero);
-        //            }
-        //            else
-        //            {
-        //                MessageBox.Show(ret.ErrorCode.ToString() + ret.ErrorMsg);
-        //            }
-        //        }
-        //        catch (Exception exp)
-        //        {
-        //            MessageBox.Show("合成失败，异常信息：" + exp.Message);
-        //        }
+					mciSendString("close temp_alias", null, 0, IntPtr.Zero);
+				}
+				else
+				{
+					MessageBox.Show(ret.ErrorCode.ToString() + ret.ErrorMsg);
+				}
+			}
+			catch (Exception exp)
+			{
+				MessageBox.Show("合成失败，异常信息：" + exp.Message);
+			}
 
-        //    }
-        //    catch(Exception exp)
-        //    {
-
-        //    }
-        //}
+		}
     }  
 
     public class FaceInfo
