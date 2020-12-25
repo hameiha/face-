@@ -39,17 +39,17 @@
             this.userID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.userInfo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.btnSignFormSelect = new System.Windows.Forms.Button();
-            this.dateStart = new System.Windows.Forms.DateTimePicker();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.dateEnd = new System.Windows.Forms.DateTimePicker();
             this.lvSignForm = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label2 = new System.Windows.Forms.Label();
+            this.dateEnd = new System.Windows.Forms.DateTimePicker();
+            this.label1 = new System.Windows.Forms.Label();
+            this.dateStart = new System.Windows.Forms.DateTimePicker();
+            this.btnSignFormSelect = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -157,12 +157,12 @@
             // userID
             // 
             this.userID.Text = "用户ID";
-            this.userID.Width = 80;
+            this.userID.Width = 70;
             // 
             // userInfo
             // 
             this.userInfo.Text = "用户信息";
-            this.userInfo.Width = 200;
+            this.userInfo.Width = 130;
             // 
             // groupBox3
             // 
@@ -179,48 +179,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "签到表";
             // 
-            // btnSignFormSelect
-            // 
-            this.btnSignFormSelect.Location = new System.Drawing.Point(6, 25);
-            this.btnSignFormSelect.Name = "btnSignFormSelect";
-            this.btnSignFormSelect.Size = new System.Drawing.Size(75, 29);
-            this.btnSignFormSelect.TabIndex = 0;
-            this.btnSignFormSelect.Text = "查询";
-            this.btnSignFormSelect.UseVisualStyleBackColor = true;
-            this.btnSignFormSelect.Click += new System.EventHandler(this.btnSignFormSelect_Click);
-            // 
-            // dateStart
-            // 
-            this.dateStart.Location = new System.Drawing.Point(181, 29);
-            this.dateStart.Name = "dateStart";
-            this.dateStart.Size = new System.Drawing.Size(135, 25);
-            this.dateStart.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(108, 35);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(67, 15);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "开始时间";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(351, 35);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(67, 15);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "结束时间";
-            // 
-            // dateEnd
-            // 
-            this.dateEnd.Location = new System.Drawing.Point(424, 29);
-            this.dateEnd.Name = "dateEnd";
-            this.dateEnd.Size = new System.Drawing.Size(135, 25);
-            this.dateEnd.TabIndex = 3;
-            // 
             // lvSignForm
             // 
             this.lvSignForm.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -229,6 +187,7 @@
             this.columnHeader3,
             this.columnHeader4,
             this.columnHeader5});
+            this.lvSignForm.FullRowSelect = true;
             this.lvSignForm.Location = new System.Drawing.Point(6, 84);
             this.lvSignForm.Name = "lvSignForm";
             this.lvSignForm.Size = new System.Drawing.Size(553, 319);
@@ -258,6 +217,48 @@
             // 
             this.columnHeader5.Text = "签到时间";
             this.columnHeader5.Width = 150;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(351, 35);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(67, 15);
+            this.label2.TabIndex = 4;
+            this.label2.Text = "结束时间";
+            // 
+            // dateEnd
+            // 
+            this.dateEnd.Location = new System.Drawing.Point(424, 29);
+            this.dateEnd.Name = "dateEnd";
+            this.dateEnd.Size = new System.Drawing.Size(135, 25);
+            this.dateEnd.TabIndex = 3;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(108, 35);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(67, 15);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "开始时间";
+            // 
+            // dateStart
+            // 
+            this.dateStart.Location = new System.Drawing.Point(181, 29);
+            this.dateStart.Name = "dateStart";
+            this.dateStart.Size = new System.Drawing.Size(135, 25);
+            this.dateStart.TabIndex = 1;
+            // 
+            // btnSignFormSelect
+            // 
+            this.btnSignFormSelect.Location = new System.Drawing.Point(6, 25);
+            this.btnSignFormSelect.Name = "btnSignFormSelect";
+            this.btnSignFormSelect.Size = new System.Drawing.Size(75, 29);
+            this.btnSignFormSelect.TabIndex = 0;
+            this.btnSignFormSelect.Text = "查询";
+            this.btnSignFormSelect.UseVisualStyleBackColor = true;
+            this.btnSignFormSelect.Click += new System.EventHandler(this.btnSignFormSelect_Click);
             // 
             // DataManage
             // 

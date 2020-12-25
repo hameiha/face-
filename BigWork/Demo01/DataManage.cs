@@ -14,6 +14,7 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Data.SQLite;
+using System.Threading;
 
 namespace Demo01
 {
@@ -227,13 +228,13 @@ namespace Demo01
         {
             try
             {
+                this.listView1.Items.Clear();
                 var client = new Face(appKey, sKey);
                 var result = client.GroupGetusers(strGroupID);
                 Console.WriteLine(result);
 
                 var users = JsonConvert.DeserializeObject<List<string>>(result["result"]["user_id_list"].ToString());
-                if (users.Count > 0 && this.lbGroups.Items.Count > 0)
-                    this.listView1.Items.Clear();
+                int i = 0;
                 foreach (var item in users)
                 {
                     this.listView1.Items.Add(new ListViewItem(new string[]
@@ -241,7 +242,10 @@ namespace Demo01
                             item,
                             GetUserInfo(client, item, strGroupID)
                         }));
-                    ;
+                    //由于百度每秒限制2次查询，所以每查询两次需等待1秒
+                    if (++i % 2 == 0)
+                        Thread.Sleep(1000);
+                        
                 }
 
             }
@@ -271,54 +275,8 @@ namespace Demo01
                 MessageBox.Show("获取用户信息失败，错误信息：" + exp.Message);
             }
             return "";
-        }
-
-        // 用户信息查询
-        public void userGet(string strGroupID, string strUserID)
-        {
-            //string host = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/get?access_token=" + TOKEN;
-            //Encoding encoding = Encoding.Default;
-            //HttpWebRequest request = (HttpWebRequest)WebRequest.Create(host);
-            //request.Method = "post";
-            //request.KeepAlive = true;
-            //String str = "{\"user_id\":\"" + strUserID + "\",\"group_id\":\"" + strGroupID+"\"}";
-            //byte[] buffer = encoding.GetBytes(str);
-            //request.ContentLength = buffer.Length;
-            //request.GetRequestStream().Write(buffer, 0, buffer.Length);
-            //HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            //StreamReader reader = new StreamReader(response.GetResponseStream(), Encoding.Default);
-            //string result = reader.ReadToEnd();
-            //Console.WriteLine("用户信息查询:");
-            //Console.WriteLine(result);
-            //return result;
-        }
-
-        private void GetUserInfoFromSQL(string strUserId)
-        {
-            //using (SQLiteConnection conn = new SQLiteConnection(strSqlPath))
-            //{
-            //    string strSQL = "select * from userInfo where userId = \"" + strUserId + "\"";
-
-            //    using (SQLiteCommand cmd = new SQLiteCommand(strSQL, conn))
-            //    {
-            //        conn.Open();
-            //        using (SQLiteDataReader dbReader = cmd.ExecuteReader())
-            //        {
-            //            if(dbReader.HasRows)
-            //            {
-            //                while(dbReader.Read())
-            //                {
-            //                    string strUserName = dbReader.GetString(1);
-            //                    Console.WriteLine(dbReader.GetString(0) + dbReader.GetString(1));
-            //                    return strUserName;
-            //                }
-            //            }
-            //        }
-            //    }
-            //}
-            //return "";
-        }
-
+        }        
+        
         /// <summary>
         /// 用户组选择改变的时候更新对应的用户信息
         /// </summary>
@@ -386,6 +344,7 @@ namespace Demo01
         /// <param name="e"></param>
         private void btnSignFormSelect_Click(object sender, EventArgs e)
         {
+            this.lvSignForm.Items.Clear();
             using (SQLiteConnection conn = new SQLiteConnection(strSqlPath))
             {
                 string strSQL = $"select * from signform where signtime >= '{this.dateStart.Value.ToString("yyyy-MM-dd")}' and signtime <= '{this.dateEnd.Value.AddDays(1).ToString("yyyy-MM-dd")}'";
