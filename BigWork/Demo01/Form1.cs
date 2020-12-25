@@ -244,6 +244,7 @@ namespace Demo01
 			{
 				var userList = JsonConvert.DeserializeObject<List<SearchResult>>(result["result"]["user_list"].ToString());
 				int index = 1;
+                string strAllUser = "";
 				foreach (var item in userList)
 				{
 					if(item.Score > 80.0)
@@ -255,6 +256,7 @@ namespace Demo01
 							item.User_id,
 							item.User_info
 							}));
+                        strAllUser += item.User_info + ",";
 					}
 				}
 			}
@@ -263,7 +265,56 @@ namespace Demo01
 				return;
 			}
 		}
-    }
+
+        //private void VoiceBroadcast(string strAllUserInfo)
+        //{
+        //    try
+        //    {
+        //            var client = new Baidu.Aip.Speech.Tts(voiceAppKey, voiceSshKey);
+
+        //            var options = new Dictionary<string, object>()
+        //    {
+        //        {"spd", this.trbSpeed.Value},    //语速
+        //        {"vol", this.trbVolume.Value},     //音量
+        //        {"pit", this.trbTonality.Value },  //音调
+        //        {"aue", GetSynthesisFormat(this.cbxSynthesisFormat.SelectedItem.ToString()) },  //输出的合成格式
+        //        {"per", GetSpeaker(this.cbxSpeaker.SelectedItem.ToString())}     //语音人
+        //    };
+
+        //            var ret = client.Synthesis(this.textInfoToSynthesis.Text, options);
+
+        //            if (ret.ErrorCode == 0)
+        //            {
+        //                File.WriteAllBytes("temp." + this.cbxSynthesisFormat.SelectedItem.ToString(), ret.Data);
+        //                mciSendString("open temp." + this.cbxSynthesisFormat.SelectedItem.ToString() + " alias temp_alias", null, 0, IntPtr.Zero);
+        //                mciSendString("play temp_alias", null, 0, IntPtr.Zero);
+
+        //                StringBuilder strRet = new StringBuilder(64);
+
+        //                do
+        //                {
+        //                    mciSendString("status temp_alias mode", strRet, 64, IntPtr.Zero);
+        //                } while (!strRet.ToString().Contains("stopped"));
+
+        //                mciSendString("close temp_alias", null, 0, IntPtr.Zero);
+        //            }
+        //            else
+        //            {
+        //                MessageBox.Show(ret.ErrorCode.ToString() + ret.ErrorMsg);
+        //            }
+        //        }
+        //        catch (Exception exp)
+        //        {
+        //            MessageBox.Show("合成失败，异常信息：" + exp.Message);
+        //        }
+
+        //    }
+        //    catch(Exception exp)
+        //    {
+
+        //    }
+        //}
+    }  
 
     public class FaceInfo
 	{
