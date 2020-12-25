@@ -88,6 +88,7 @@ namespace Demo01
             {
                 camreaOn = false;
                 DisConnect();
+                this.button1.Text = "摄像头识别";
             }           
         }
 
