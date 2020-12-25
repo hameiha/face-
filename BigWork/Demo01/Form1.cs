@@ -179,7 +179,8 @@ namespace Demo01
                             Image img = pictureBox2.Image;
 
                             var faceArr = JsonConvert.DeserializeObject<List<FaceCheckResult>>(result["result"]["face_list"].ToString());
-                            foreach(var item in faceArr)
+                            string strAllUsers = "";
+                            foreach (var item in faceArr)
 							{
 								Graphics g = Graphics.FromImage(img);
 								Pen pen = new Pen(Color.Red, 3);
@@ -189,7 +190,12 @@ namespace Demo01
                                 g.DrawRectangle(pen, new Rectangle(0, 0, (int)item.location.width, (int)item.location.height));
 
                                 g.Dispose();
-								FaceSearch(item);
+								strAllUsers += FaceSearch(item);
+                            }
+                            if(!string.IsNullOrEmpty(strAllUsers))
+                            {
+                                Thread tVoice = new Thread(VoiceBroadcast);
+                                tVoice.Start("你好，" + strAllUsers);
                             }
                         };
                     }));
@@ -236,7 +242,7 @@ namespace Demo01
 		/// 进行人脸库的搜索，根据人脸检测的结果中的face
 		/// </summary>
 		/// <returns></returns>
-		private void FaceSearch(FaceCheckResult faceResult)
+		private string FaceSearch(FaceCheckResult faceResult)
 		{	
 
 			var client = new Baidu.Aip.Face.Face(appKey, sKey);
@@ -262,19 +268,21 @@ namespace Demo01
                         strAllUser += item.User_info + ",";
 					}
 				}
-				VoiceBroadcast("你好，" + strAllUser);
+				return strAllUser;
 			}
 			else
 			{
-				return;
+				return "";
 			}
 		}
 
-		private void VoiceBroadcast(string strAllUserInfo)
+		private void VoiceBroadcast(object obj)
 		{
 			try
 			{
-				var client = new Baidu.Aip.Speech.Tts(voiceAppKey, voiceSshKey);
+                string strAllUserInfo = obj as string;
+
+                var client = new Baidu.Aip.Speech.Tts(voiceAppKey, voiceSshKey);
 
 				var options = new Dictionary<string, object>()
 				{
@@ -284,27 +292,32 @@ namespace Demo01
 				};
 
 				var ret = client.Synthesis(strAllUserInfo, options);
+                if (ret.ErrorCode == 0)
+                {
+                    this.BeginInvoke(new Action(() =>
+                {
+                   
+                        File.WriteAllBytes("temp.mp3", ret.Data);
+                        mciSendString("open temp.mp3" + " alias temp_alias", null, 0, IntPtr.Zero);
+                        mciSendString("play temp_alias", null, 0, IntPtr.Zero);
 
-				if (ret.ErrorCode == 0)
-				{
-					File.WriteAllBytes("temp.mp3", ret.Data);
-					mciSendString("open temp.mp3" + " alias temp_alias", null, 0, IntPtr.Zero);
-					mciSendString("play temp_alias", null, 0, IntPtr.Zero);
+                        StringBuilder strRet = new StringBuilder(64);
 
-					StringBuilder strRet = new StringBuilder(64);
+                        do
+                        {
+                            mciSendString("status temp_alias mode", strRet, 64, IntPtr.Zero);
+                        } while (!strRet.ToString().Contains("stopped"));
 
-					do
-					{
-						mciSendString("status temp_alias mode", strRet, 64, IntPtr.Zero);
-					} while (!strRet.ToString().Contains("stopped"));
+                        mciSendString("close temp_alias", null, 0, IntPtr.Zero);
 
-					mciSendString("close temp_alias", null, 0, IntPtr.Zero);
-				}
-				else
-				{
-					MessageBox.Show(ret.ErrorCode.ToString() + ret.ErrorMsg);
-				}
-			}
+                }));
+                }
+                else
+                {
+                    MessageBox.Show(ret.ErrorCode.ToString() + ret.ErrorMsg);
+                }
+
+            }
 			catch (Exception exp)
 			{
 				MessageBox.Show("合成失败，异常信息：" + exp.Message);
