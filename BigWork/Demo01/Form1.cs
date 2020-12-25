@@ -267,7 +267,9 @@ namespace Demo01
 							item.User_info
 							}));
                         strAllUser += item.User_info + ",";
-					}
+                        InsertSignTime(item.Group_id, item.User_id, item.User_info, DateTime.Now);
+
+                    }
 				}
 				return strAllUser;
 			}
@@ -277,6 +279,10 @@ namespace Demo01
 			}
 		}
 
+        /// <summary>
+        /// 语音播放接口
+        /// </summary>
+        /// <param name="obj"></param>
 		private void VoiceBroadcast(object obj)
 		{
 			try
@@ -325,6 +331,31 @@ namespace Demo01
 			}
 
 		}
+
+        private void InsertSignTime(string groupId, string userId, string userInfo, DateTime signTime)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(strSqlPath))
+            {
+                string strSQL = $"INSERT INTO signform(groupid, userid, userinfo, signtime)VALUES('{groupId}', '{userId}', '{userInfo}', '{signTime.ToString("yyyy-MM-dd HH-mm-ss")}')";
+
+                using (SQLiteCommand cmd = new SQLiteCommand(strSQL, conn))
+                {
+                    conn.Open();
+                    using (SQLiteDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.HasRows)
+                        {
+                            while (dbReader.Read())
+                            {
+                                string strUserName = dbReader.GetString(1);
+                                Console.WriteLine(dbReader.GetString(0) + dbReader.GetString(1));
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
     }  
 
     public class FaceInfo

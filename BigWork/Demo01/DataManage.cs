@@ -377,5 +377,15 @@ namespace Demo01
 				this.listView1.ContextMenu = userMenu;
 			}
 		}
-	}
+
+        /// <summary>
+        /// 查询签到记录，根据起止时间
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnSignFormSelect_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
 }
